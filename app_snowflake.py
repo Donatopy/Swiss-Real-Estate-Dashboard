@@ -2,35 +2,37 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 from sqlalchemy import create_engine
-# Configura la conexión a Snowflake usando los secretos# Obtener secretos
+
+
+
+# Acceder a los secretos
 config = st.secrets["snowflake"]
 
-# Crear la URL de conexión
+# Verifica que los secretos se cargan correctamente
+st.write("Secretos cargados:", config)
+st.write("Usuario Snowflake:", config["user"])
+
+# Crear la URL de conexión a Snowflake
 engine_url = (
     f'snowflake://{config["user"]}:{config["password"]}@{config["account"]}/'
     f'{config["database"]}/{config["schema"]}?warehouse={config["warehouse"]}'
 )
 
-st.write("Engine URL:", engine_url)  # Verifica la URL de conexión
+# Crear el motor de SQLAlchemy para la conexión
+engine = create_engine(engine_url, echo=True)
 
-# Crear el motor de SQLAlchemy
-try:
-    engine = create_engine(engine_url, echo=True)
-    st.write("Engine creado con éxito.")
-except Exception as e:
-    st.error(f"Error al crear el motor: {e}")
+# Probar la conexión y cargar los datos
 def load_data():
     try:
-        st.write("Intentando cargar datos desde Snowflake...")
-        query = 'SELECT * FROM PROPERTY_DATA.HOUSES LIMIT 10;'  # Ajusta la consulta según sea necesario
-        df = pd.read_sql_query(query, con=engine)
-        st.write("Datos cargados exitosamente.")
+        st.write("Intentando cargar los datos...")
+        query = 'SELECT * FROM PROPERTY_DATA.HOUSES LIMIT 10;'
+        with engine.connect() as conn:
+            df = pd.read_sql(query, conn)
+        st.write("Datos cargados con éxito.")
         return df
     except Exception as e:
         st.error(f"Error al cargar los datos: {e}")
-        return pd.DataFrame()
-
-
+        return None
 df = load_data()
 
 # Rename columns to match expected names
