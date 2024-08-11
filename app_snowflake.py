@@ -28,13 +28,15 @@ def get_engine():
 def load_data():
     try:
         engine = get_engine()
-        query = 'SELECT * FROM REAL_ESTATE_DB.PROPERTY_DATA.HOUSES;'
+        st.write("Attempting to load data...")
+        query = 'SELECT * FROM PROPERTY_DATA.HOUSES;'
         with engine.connect() as conn:
-            df = pd.read_sql(query, conn)
+            df = pd.read_sql(text(query), conn)
+        st.write("Data loaded successfully.")
         return df
     except Exception as e:
         st.error(f"Error loading data: {e}")
-        return pd.DataFrame()  # Return an empty DataFrame in case of error
+        return pd.DataFrame()
 
 df = load_data()
 
