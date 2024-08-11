@@ -3,7 +3,6 @@ import streamlit as st
 import plotly.express as px
 from sqlalchemy import create_engine
 # Configura la conexión a Snowflake usando los secretos
-# Configura la conexión a Snowflake usando los secretos
 def get_engine():
     try:
         # Obtener secretos
@@ -19,6 +18,7 @@ def get_engine():
         
         # Crear el motor de SQLAlchemy
         engine = create_engine(engine_url, echo=True)
+        st.write("Engine creado con éxito.")
         return engine
     except KeyError as e:
         st.error(f"Error con los secretos: {e}")
@@ -27,7 +27,6 @@ def get_engine():
         st.error(f"Error al configurar la conexión: {e}")
         raise
 
-# Cargar datos desde Snowflake
 def load_data():
     try:
         st.write("Intentando cargar datos...")
@@ -37,9 +36,9 @@ def load_data():
         
         # Ejecutar la consulta y cargar datos en un DataFrame
         with engine.connect() as conn:
-            df = pd.read_sql(text(query), conn)
+            st.write("Conectando a Snowflake...")
+            df = pd.read_sql(query, conn)
         
-        # Mostrar columnas del DataFrame para depuración
         st.write("Datos cargados con éxito.")
         st.write("Columnas del DataFrame:", df.columns)
         st.write("Primeras filas del DataFrame:", df.head())
