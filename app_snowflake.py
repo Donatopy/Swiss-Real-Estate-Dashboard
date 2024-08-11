@@ -55,6 +55,16 @@ def plot_price_distribution(df):
         xaxis_tickprefix='$',
         xaxis_tickformat='.2f'
     )
+    # Add description
+    fig.add_annotation(
+        text="This histogram shows the distribution of house prices in CHF. It helps to understand the frequency of various price ranges.",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.15,
+        showarrow=False,
+        font=dict(size=12, color="grey"),
+        align="center"
+    )
+    fig.update_layout(title_x=0.5)  # Center title
     st.plotly_chart(fig)
 
 def plot_house_type_distribution(df):
@@ -110,6 +120,15 @@ def main():
     """Main function to run the Streamlit app."""
     st.title("Swiss Real Estate Dashboard")
 
+    # Add general description with link
+    st.markdown("""
+    Welcome to the Swiss Real Estate Dashboard! This application provides insights into the Swiss property market through various visualizations. 
+    Explore the distribution of house prices, types of houses, and the relationship between living space, number of rooms, and year built. 
+    Additionally, view the most and least expensive localities to make informed real estate decisions.
+
+    The dataset used for this dashboard is sourced from Kaggle. You can find the dataset [here](https://www.kaggle.com/datasets/etiennekaiser/switzerland-house-price-prediction-data/data).
+    """)
+
     # Get configuration secrets
     config = get_secrets()
     if not config:
@@ -126,13 +145,13 @@ def main():
     
     df = preprocess_data(df)
     
-    # Generate and display plots
-    plot_price_distribution(df)
-    plot_house_type_distribution(df)
-    plot_living_space_vs_rooms(df)
-    plot_year_built_vs_price(df)
-    plot_top_expensive_localities(df)
-    plot_top_cheap_localities(df)
+    # Generate and display plots in the new order
+    plot_house_type_distribution(df)  # Previously 2nd
+    plot_living_space_vs_rooms(df)     # Previously 3rd
+    plot_year_built_vs_price(df)       # Previously 4th
+    plot_price_distribution(df)        # Moved to 4th position
+    plot_top_expensive_localities(df)  # Previously 5th
+    plot_top_cheap_localities(df)      # Previously 6th
 
 if __name__ == "__main__":
     main()
