@@ -7,7 +7,6 @@ from sqlalchemy import create_engine
 def load_config():
     try:
         config = st.secrets["snowflake"]
-        print(config)  # Print content for debugging
         return config
     except KeyError as e:
         st.error(f"Key error: {e}")
