@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 # Load configuration from Streamlit secrets
 def load_config():
     try:
-        config = st.secrets["snowflake"]
+        config = st.secrets[snowflake]
         return config
     except KeyError as e:
         st.error(f"Key error: {e}")
