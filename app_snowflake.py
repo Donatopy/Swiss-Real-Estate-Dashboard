@@ -7,7 +7,6 @@ import toml
 # Load configuration from the TOML file
 def load_config():
     try:
-        [snowflake]
         user = st.secrets.snowflake.user
         password = st.secrets.snowflake.password
         account = st.secrets.snowflake.account
