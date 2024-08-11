@@ -2,24 +2,9 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 from sqlalchemy import create_engine
-import toml
-
-# Load configuration from the TOML file
-def load_config():
-    try:
-        config = toml.load('config.toml')
-        print(config)  # Print content for debugging
-        return config['snowflake']
-    except KeyError as e:
-        print(f"Key error: {e}")
-        raise
-    except Exception as e:
-        print(f"Error loading configuration: {e}")
-        raise
 
 # Configure Snowflake connection using the configuration from the TOML file
 def get_engine():
-    config = load_config()
     engine_url = (
         f'snowflake://{config["user"]}:{config["password"]}@{config["account"]}/'
         f'{config["database"]}/{config["schema"]}?warehouse={config["warehouse"]}'
