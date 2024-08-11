@@ -2,41 +2,38 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 from sqlalchemy import create_engine
-
-# Load configuration from Streamlit secrets
-def load_config():
+# Configura la conexión a Snowflake usando los secretos
+def get_engine():
     try:
-        config = st.secrets[snowflake]
-        return config
+        config = st.secrets["snowflake"]
+        st.write("Secretos cargados:", config)  # Verificar los secretos
+        engine_url = (
+            f'snowflake://{config["user"]}:{config["password"]}@{config["account"]}/'
+            f'{config["database"]}/{config["schema"]}?warehouse={config["warehouse"]}'
+        )
+        return create_engine(engine_url, echo=True)
     except KeyError as e:
-        st.error(f"Key error: {e}")
+        st.error(f"Error con los secretos: {e}")
         raise
     except Exception as e:
-        st.error(f"Error loading configuration: {e}")
+        st.error(f"Error al configurar la conexión: {e}")
         raise
 
-# Configure Snowflake connection using the configuration from Streamlit secrets
-def get_engine():
-    config = load_config()
-    engine_url = (
-        f'snowflake://{config["user"]}:{config["password"]}@{config["account"]}/'
-        f'{config["database"]}/{config["schema"]}?warehouse={config["warehouse"]}'
-    )
-    return create_engine(engine_url, echo=True)
-
-# Connect to Snowflake and load data
+# Cargar datos desde Snowflake
 def load_data():
     try:
         engine = get_engine()
         st.write("Attempting to load data...")
-        query = 'SELECT * FROM PROPERTY_DATA.HOUSES;'
+        query = 'SELECT * FROM PROPERTY_DATA.HOUSES LIMIT 10;'
         with engine.connect() as conn:
             df = pd.read_sql(text(query), conn)
         st.write("Data loaded successfully.")
+        st.write("DataFrame columns:", df.columns)  # Mostrar columnas
         return df
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return pd.DataFrame()
+
 
 df = load_data()
 
