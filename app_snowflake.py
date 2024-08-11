@@ -2,25 +2,21 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 from sqlalchemy import create_engine
-import toml
 
-# Load configuration from the TOML file
+# Load configuration from Streamlit secrets
 def load_config():
     try:
-        user = st.secrets.snowflake.user
-        password = st.secrets.snowflake.password
-        account = st.secrets.snowflake.account
-        warehouse = st.secrets.snowflake.warehouse
-        database = st.secrets.snowflake.database
-        schema = st.secrets.snowflake.schema
+        config = st.secrets["snowflake"]
+        print(config)  # Print content for debugging
+        return config
     except KeyError as e:
-        print(f"Key error: {e}")
+        st.error(f"Key error: {e}")
         raise
     except Exception as e:
-        print(f"Error loading configuration: {e}")
+        st.error(f"Error loading configuration: {e}")
         raise
 
-# Configure Snowflake connection using the configuration from the TOML file
+# Configure Snowflake connection using the configuration from Streamlit secrets
 def get_engine():
     config = load_config()
     engine_url = (
@@ -31,11 +27,15 @@ def get_engine():
 
 # Connect to Snowflake and load data
 def load_data():
-    engine = get_engine()
-    query = 'SELECT * FROM REAL_ESTATE_DB.PROPERTY_DATA.HOUSES;'
-    with engine.connect() as conn:
-        df = pd.read_sql(query, conn)
-    return df
+    try:
+        engine = get_engine()
+        query = 'SELECT * FROM REAL_ESTATE_DB.PROPERTY_DATA.HOUSES;'
+        with engine.connect() as conn:
+            df = pd.read_sql(query, conn)
+        return df
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return pd.DataFrame()  # Return an empty DataFrame in case of error
 
 df = load_data()
 
