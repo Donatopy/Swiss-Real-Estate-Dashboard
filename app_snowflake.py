@@ -5,24 +5,24 @@ from sqlalchemy import create_engine
 # Configura la conexión a Snowflake usando los secretos
 def get_engine():
     try:
-        # Obtener secretos
-        config = st.secrets["snowflake"]
-        st.write("Secretos cargados:", config)  # Verifica que los secretos se cargan correctamente
-        
-        # Crear la URL de conexión
+        # Obtener los secretos desde st.secrets
+        user = st.secrets["user"]
+        password = st.secrets["password"]
+        account = st.secrets["account"]
+        warehouse = st.secrets["warehouse"]
+        database = st.secrets["database"]
+        schema = st.secrets["schema"]
+
+        # Crear la URL de conexión usando los valores individuales
         engine_url = (
-            f'snowflake://{config["user"]}:{config["password"]}@{config["account"]}/'
-            f'{config["database"]}/{config["schema"]}?warehouse={config["warehouse"]}'
+            f'snowflake://{user}:{password}@{account}/'
+            f'{database}/{schema}?warehouse={warehouse}'
         )
-        st.write("Engine URL:", engine_url)  # Verifica la URL de conexión
         
         # Crear el motor de SQLAlchemy
         engine = create_engine(engine_url, echo=True)
-        st.write("Engine creado con éxito.")
         return engine
-    except KeyError as e:
-        st.error(f"Error con los secretos: {e}")
-        raise
+    
     except Exception as e:
         st.error(f"Error al configurar la conexión: {e}")
         raise
@@ -31,6 +31,7 @@ def load_data():
     try:
         st.write("Intentando cargar datos...")
         engine = get_engine()  # Obtener el motor de conexión
+        
         query = 'SELECT * FROM PROPERTY_DATA.HOUSES LIMIT 10;'
         st.write("Query SQL:", query)  # Verifica la consulta SQL
         
@@ -40,13 +41,12 @@ def load_data():
             df = pd.read_sql(query, conn)
         
         st.write("Datos cargados con éxito.")
-        st.write("Columnas del DataFrame:", df.columns)
-        st.write("Primeras filas del DataFrame:", df.head())
-        
         return df
+    
     except Exception as e:
         st.error(f"Error al cargar datos: {e}")
         return pd.DataFrame()
+
 df = load_data()
 
 # Rename columns to match expected names
