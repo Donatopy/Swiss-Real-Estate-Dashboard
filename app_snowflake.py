@@ -127,6 +127,9 @@ def main():
     Additionally, view the most and least expensive localities to make informed real estate decisions.
 
     The dataset used for this dashboard is sourced from Kaggle. You can find the dataset [here](https://www.kaggle.com/datasets/etiennekaiser/switzerland-house-price-prediction-data/data).
+    For the source code and additional resources, visit the [GitHub repository](https://github.com/Donatopy/Swiss-Real-Estate-Dashboard).
+
+    
     """)
 
     # Get configuration secrets
